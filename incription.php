@@ -13,6 +13,21 @@ if(isset($_POST["inscription"])){
         $message= 'rentrer un mot de passe valide !';
 }else{
     require_once 'include/start_bdd.php';
+
+    $re= $bdd->prepare('SELECT * FROM table_membre WHERE Nom = :username');
+    $re->bindValue(':username', $_POST['Nom']);
+    $re->execute();
+    $result= $re->fetch();
+
+    $re1= $bdd->prepare('SELECT * FROM table_membre WHERE email = :mail');
+    $re1->bindValue(':mail', $_POST['mail']);
+    $re1->execute();
+    $result1= $re1->fetch();
+    if($result){
+        $message='le nom existe déja';
+    }elseif($result1){
+        $message= 'un compte mail exite deja ';
+    }else{
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $requet = $bdd->prepare('INSERT INTO table_membre(Nom,email,Mot_de_passe) VALUES(:nom,:email,:motpass)');
     $requet->bindValue(':nom', $_POST['Nom']);
@@ -20,6 +35,7 @@ if(isset($_POST["inscription"])){
     $requet->bindValue(':motpass', $password);
     $requet->execute();
     $message= 'vous êtes bien inscrit';
+    }
 }
 }
 ?>
